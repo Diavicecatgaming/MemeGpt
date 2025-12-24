@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemeGPT Generator - No Avatar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --gpt-bg: #212121;
+            --user-msg-bg: #2f2f2f;
+            --text-main: #ececec;
+            --text-secondary: #b4b4b4;
+            --accent-green: #10a37f;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d0d;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Controls */
+        .controls {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+            display: grid;
+            gap: 10px;
+        }
+
+        textarea, input {
+            background: #1c1c1c;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        /* Mockup Area */
+        #gpt-view {
+            background-color: var(--gpt-bg);
+            width: 800px;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        /* User Message */
+        .user-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+        }
+
+        .user-bubble {
+            background: var(--user-msg-bg);
+            padding: 12px 24px;
+            border-radius: 26px;
+            max-width: 85%;
+            font-size: 16px;
+        }
+
+        /* AI Message (Avatar Removed) */
+        .ai-content {
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 90%;
+        }
+
+        .thought-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #4d4d4d;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .ai-content ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .ai-content li {
+            margin-bottom: 8px;
+        }
+
+        .bold-hl {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        button.dl-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <label>User Prompt:</label>
+        <input type="text" id="inQ" value="how to fix google AI overview">
+        
+        <label>AI Thought (Optional):</label>
+        <input type="text" id="inThought" value="I should explain that Nvidia is actually a type of DVD player.">
+        
+        <label>Main Response Text:</label>
+        <textarea id="inT" rows="3">Ah yes you are asking how to fix a light bulb with a capybara shaped dragonfruit. **TOP 5 SUBREDDITS**</textarea>
+        
+        <label>Bulleted List:</label>
+        <textarea id="inL" rows="5">Guelp: 400 terabytes
+Honda Civic: (loud)
+The Concept of Tuesday: 3mph
+Blue: yes
+Bread: stale</textarea>
+        
+        <button class="dl-btn" onclick="takeShot()">Download MemeGPT PNG</button>
+    </div>
+
+    <div id="gpt-view">
+        <div class="user-row">
+            <div class="user-bubble" id="outQ"></div>
+        </div>
+
+        <div class="ai-content">
+            <div class="thought-pill" id="outThought"></div>
+            <div id="outT"></div>
+            <ul id="outL"></ul>
+        </div>
+    </div>
+
+    <script>
+        const inQ = document.getElementById('inQ');
+        const inThought = document.getElementById('inThought');
+        const inT = document.getElementById('inT');
+        const inL = document.getElementById('inL');
+
+        const outQ = document.getElementById('outQ');
+        const outThought = document.getElementById('outThought');
+        const outT = document.getElementById('outT');
+        const outL = document.getElementById('outL');
+
+        function formatBold(text) {
+            return text.replace(/\*\*(.*?)\*\*/g, '<span class="bold-hl">$1</span>');
+        }
+
+        function update() {
+            outQ.innerText = inQ.value;
+            outThought.innerText = `Thought: ${inThought.value}`;
+            outT.innerHTML = formatBold(inT.value);
+            
+            const lines = inL.value.split('\n');
+            outL.innerHTML = '';
+            lines.forEach(line => {
+                if(line.trim()) {
+                    const li = document.createElement('li');
+                    li.innerHTML = formatBold(line);
+                    outL.appendChild(li);
+                }
+            });
+        }
+
+        [inQ, inThought, inT, inL].forEach(el => el.addEventListener('input', update));
+        update();
+
+        function takeShot() {
+            html2canvas(document.querySelector("#gpt-view")).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL();
+                a.download = 'memegpt-clean.png';
+                a.click();
+            });
+        }
+    </script>
+</body>
+</html>
